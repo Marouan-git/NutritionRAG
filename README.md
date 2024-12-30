@@ -1,181 +1,81 @@
-# Projet TP MIAGE M2 - Agent Conversationnel
+# NutrIA project - Conversational agents - M2IA2
 
-## Structure du Projet
+Members : 
+- Jarod Acloque
+- Jaafar El Bakkali
+- Marouan Boulli
+
+## Purpose
+
+Design a chatbot with 2 main purposes:
+1. Provide nutrition advices based on a best nutrition practices knowledge base.
+2. Recommend dishes to suit the user profile.
+
+
+## Backend project structure
 
 ```
 C:.
-├───api/                    # Gestion des routes et endpoints de l'API
-│   ├───endpoints/         # Endpoints spécifiques par fonctionnalité
-│   │   └───chat.py       # Endpoint pour les fonctionnalités de chat
-│   └───router.py         # Router principal regroupant tous les endpoints
-├───core/                  # Configuration et éléments centraux de l'application
-├───models/               # Modèles de données Pydantic
-│   └───chat.py          # Modèles pour les requêtes/réponses de chat
-├───services/            # Services métier
-│   └───llm_service.py   # Service d'interaction avec le LLM
-├───utils/               # Utilitaires et helpers
-└───main.py             # Point d'entrée de l'application
+│   main.py                # Point d'entrée de l'application           
+│
+├───api
+│   │   router.py          # Router principal regroupant tous les endpoints
+│   │
+│   └───endpoints
+│           chat.py        # Endpoint pour les fonctionnalités de chat
+│
+├───core
+│       config.py          # Configuration des éléments centraux de l'application
+│
+├───models
+│       chat.py            # Modèles pour les requêtes/réponses de chat
+│       conversation.py    # Modèles pour la gestion des messages et cnversations
+│
+└───services
+        llm_service.py     # Service d'interaction avec le LLM
+        memory.py          # Service de gestion de la mémoire (utile pour la version sans persistance)
+        mongo_service.py   # Service d'interaction avec la base de données Mongo
 ```
-
 ## Installation et Configuration
 
-### Prérequis
-- Python 3.11+ (ici : https://www.python.org/downloads/release/python-3110/ il faut redémarrer après installation pour avoir le $PATH sur l'OS)
-- Visual Studio Code avec l'extension Python
-- Une clé OpenAI que je vais vous fournir
+### Prerequisites
+
+OpenAI API key and MongoDB connection information provided in an .env file.  
+Environment varables names are provided in the **.env.template** file.
 
 ### Installation
 
-1. **Cloner le projet**
+1. **Clone the project**
 ```bash
-git clone <URL_DU_DEPOT>
-cd <NOM_DU_PROJET>
+git clone https://github.com/Marouan-git/NutritionRAG.git
+cd NutritionRAG
 ```
 
-2. **Créer l'environnement virtuel**
+2. **Create the virtual environment and install dependencies**
 ```bash
-python -m venv venv
+pipenv install
 ```
 
-3. **Activer l'environnement virtuel**
-- Windows :
+If you don't have pipenv installed, install it with:
+```
+pip install pipenv
+```
+
+3. **Activate the virtual environment**
+
 ```bash
-.\venv\Scripts\activate
-```
-- macOS/Linux :
-```bash
-source venv/bin/activate
-```
-
-4. **Installer les dépendances**
-```bash
-pip install -r requirements.txt
-```
-
-5. **Configurer la clé API OpenAI**
-Créer un fichier `.env` à la racine du projet :
-```
-OPENAI_API_KEY=votre-clé-api-openai
+pipenv shell
 ```
 
 
-## Explication des Composants
-
-### 1. Main Application (`main.py`)
-```python
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+5. **Configure your .env file**
+Create a `.env` file at the root of the project, and put the following variables:
 ```
-- Point d'entrée de l'application
-- Configure FastAPI et les middlewares
-- Initialise les routes
-
-### 2. Modèles (`models/chat.py`)
-```python
-class ChatRequest(BaseModel):
-    message: str
+OPENAI_API_KEY=<your OpenAI API key>
+MONGODB_URI=<your MongoDB URI for connection>
+DATABASE_NAME=<database name on Mongo>
+COLLECTION_NAME=<collection name on Mongo>
 ```
-- Définit la structure des données entrantes/sortantes
-- Utilise Pydantic pour la validation des données
-- Version simple pour débuter, extensible pour le contexte
-
-### 3. Service LLM (`services/llm_service.py`)
-```python
-class LLMService:
-    def __init__(self):
-        self.llm = ChatOpenAI(...)
-```
-- Gère l'interaction avec le modèle de langage
-- Configure le client OpenAI
-- Traite les messages et le contexte
-
-### 4. Router API (`api/router.py`)
-```python
-@router.post("/chat")
-async def chat(request: ChatRequest) -> ChatResponse:
-```
-- Définit les endpoints de l'API
-- Gère les requêtes HTTP
-- Valide les données entrantes
-
-## Utilisation de l'API
-
-### Version Simple
-```bash
-curl -X 'POST' \
-  'http://localhost:8000/chat/simple' \
-  -H 'Content-Type: application/json' \
-  -d '{"message": "Bonjour!"}'
-```
-
-### Version avec Contexte
-```bash
-curl -X 'POST' \
-  'http://localhost:8000/chat/with-context' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "message": "Bonjour!",
-    "context": [
-      {"role": "user", "content": "Comment vas-tu?"},
-      {"role": "assistant", "content": "Je vais bien, merci!"}
-    ]
-  }'
-```
-
-## Debugging avec VS Code
-
-1. Ouvrir le projet dans VS Code
-2. Aller dans la section "Run and Debug" (Ctrl + Shift + D)
-3. Sélectionner la configuration "Python: FastAPI"
-4. Appuyer sur F5 ou cliquer sur le bouton Play
-5. Démarrer Swagger : http://127.0.0.1:8000/docs
-
-## Structure de l'API
-
-### Endpoints Disponibles
-
-- `/chat/simple` : Version basique sans contexte
-- `/chat/with-context` : Version avancée avec gestion du contexte
-
-### Flux de Données
-
-1. La requête arrive sur l'endpoint
-2. Les modèles Pydantic valident les données
-3. Le service LLM traite la demande
-4. La réponse est formatée et renvoyée
-
-## Progression Pédagogique
-
-1. **Démarrer avec la version simple**
-   - Comprendre la structure de base
-   - Tester les appels API simples
-
-2. **Évoluer vers la version avec contexte**
-   - Ajouter la gestion de l'historique
-   - Comprendre l'importance du contexte dans les LLM
-
-3. **Explorer les fonctionnalités avancées**
-   - Implémenter des prompts personnalisés
-   - Gérer différents types de réponses
-
-## Dépannage
-
-### Problèmes Courants
-
-1. **Erreur de clé API**
-   - Vérifier le fichier `.env`
-   - S'assurer que la clé est valide
-
-2. **Erreurs de dépendances**
-   - Vérifier l'activation du venv
-   - Réinstaller les requirements
-
-3. **Erreurs de contexte**
-   - Vérifier le format du contexte
-   - S'assurer que les rôles sont valides
-
-4. **Powershell**
-   - Si les droits admin ne sont pas présent : ''Set-ExecutionPolicy Unrestricted -Scope CurrentUser -Force''
 
 ## Ressources
 
