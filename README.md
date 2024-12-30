@@ -36,7 +36,7 @@ C:.
         memory.py          # Service de gestion de la mémoire (utile pour la version sans persistance)
         mongo_service.py   # Service d'interaction avec la base de données Mongo
 ```
-## Installation et Configuration
+## Installation and Configuration
 
 ### Prerequisites
 
