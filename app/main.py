@@ -22,7 +22,8 @@ app.add_middleware(
 )
 
 # Instance du service LLM
-llm_service = LLMService()
+#llm_service = LLMService()
+
 
 # Inclure les routes
 app.include_router(api_router)
