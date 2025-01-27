@@ -24,3 +24,9 @@ class ChatMessage(BaseModel):
 class ChatHistory(BaseModel):
     """Collection de messages formant une conversation"""
     messages: List[ChatMessage]
+
+class SessionResponse(BaseModel):
+    session_id: str
+
+class RenameSessionRequest(BaseModel):
+    new_session_id: str

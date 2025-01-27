@@ -24,8 +24,8 @@ const MessageInput = ({ onSendMessage, isLoading }) => {
       <button
         type="submit"
         disabled={isLoading}
-        className={`px-4 py-2 rounded-lg bg-blue-500 text-white 
-          ${isLoading ? 'opacity-50' : 'hover:bg-blue-600'}`}
+        className={`px-4 py-2 rounded-lg bg-green-500 text-white 
+          ${isLoading ? 'opacity-50' : 'hover:bg-green-600'}`}
       >
         {isLoading ? 'Sending...' : 'Send'}
       </button>

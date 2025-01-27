@@ -1,8 +1,8 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime
-from typing import List, Dict, Optional
-from models.conversation import Conversation, Message
-from core.config import settings
+from typing import Any, List, Dict, Optional
+from app.models.conversation import Conversation, Message
+from app.core.config import settings
 import asyncio
 
 
@@ -29,6 +29,7 @@ class MongoService:
         )
         
         return result.modified_count > 0 or result.upserted_id is not None
+
     
     async def get_conversation_history(self, session_id: str) -> List[Dict]:
         """Récupère l'historique d'une conversation"""
@@ -52,6 +53,29 @@ class MongoService:
         cursor = self.conversations.find({}, {"session_id": 1})
         sessions = await cursor.to_list(length=None)
         return [session["session_id"] for session in sessions]
+    
+    async def create_empty_session(self, session_id: str) -> bool:
+        """Create an empty session document"""
+        result = await self.conversations.update_one(
+            {"session_id": session_id},
+            {
+                "$set": {
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow(),
+                    "messages": []
+                }
+            },
+            upsert=True
+        )
+        return result.upserted_id is not None
+    
+    async def rename_session(self, old_session_id: str, new_session_id: str) -> bool:
+        """Rename a session ID in MongoDB"""
+        result = await self.conversations.update_one(
+            {"session_id": old_session_id},
+            {"$set": {"session_id": new_session_id}}
+        )
+        return result.modified_count > 0
 
 # Singleton
 mongo_service = MongoService()

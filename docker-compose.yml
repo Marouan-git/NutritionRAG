@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MONGODB_URI=${MONGODB_URI}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - COLLECTION_NAME=${COLLECTION_NAME}
+    volumes:
+      - ./data/vectorstore:/app/data/vectorstore
+
+  frontend:
+    build:
+      context: ./chatbot-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount your frontend source so you can see changes immediately
+      - ./chatbot-frontend:/app
+      # Make sure node_modules is not accidentally overwritten by the local folder
+      - /app/node_modules
+    depends_on:
+      - app
+    
+
+volumes:
+  vectorstore:

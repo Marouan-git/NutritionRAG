@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import Message from './Message';
-
 const ChatWindow = ({ messages }) => {
   const messagesEndRef = useRef(null);
 
@@ -13,10 +12,10 @@ const ChatWindow = ({ messages }) => {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4">
-      {messages.map((message, index) => (
+    <div className="flex-1 overflow-y-auto p-4 h-[calc(100vh-160px)]">
+      {messages.map((message) => (
         <Message
-          key={index}
+          key={message.id}
           message={message}
           isUser={message.role === 'user'}
         />
@@ -25,5 +24,6 @@ const ChatWindow = ({ messages }) => {
     </div>
   );
 };
+
 
 export default ChatWindow;
